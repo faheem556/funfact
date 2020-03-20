@@ -1,0 +1,17 @@
+version: "3.7"
+
+services: 
+  funfact-nodejs:
+    build:
+      context: ./nodejs
+    image: funfact:node
+
+  funfact-dotnet:
+    build:
+      context: ./dotnet
+    image: funfact:dotnet
+
+  funfact-java:
+    build:
+      context: ./java
+    image: funfact:java
