@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: funfact
+  labels:
+    app: funfact
+spec:
+  containers:
+  - image: bbaksdemoacr.azurecr.io/funfact:1.0
+    name: funfact-image
+    ports:
+    - containerPort: 80
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: funfact
+spec:
+  selector:
+    app: funfact
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: funfact
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+spec:
+  rules:
+  - host: funfact.demo.azure.boxboat.io
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: funfact
+          servicePort: 80
