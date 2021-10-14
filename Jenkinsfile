@@ -1,3 +1,5 @@
+library 'jenkins-build-unstable'
+
 pipeline {
     agent any
 
@@ -14,14 +16,16 @@ pipeline {
         }
         stage('Scan') {
             steps {
-                docker.image('aquasec/trivy:0.19.2').inside("-v \$HOME/.cache/:/.cache/ --entrypoint ''") {
-                    sh "mkdir -p reports"
-                    sh "ls -lRas"
-                    sh "trivy config --no-progress --timeout 30s ./manifests"
-                    exitCode = sh(script: "trivy image --no-progress --timeout 30s --ignore-unfixed --exit-code 2 --severity HIGH,CRITICAL ./manifests", returnStatus: true)
+                script {
+                    docker.image('aquasec/trivy:0.19.2').inside("-v /Users/faheemmemon/.cache/:/.cache/ --entrypoint ''") {
+                        sh "mkdir -p reports"
+                        sh """ls -Rlatr \$libraryPath"""
+                        sh "trivy config ./manifests"
+                        exitCode = sh(script: "trivy image --exit-code 2 --severity HIGH,CRITICAL ./manifests", returnStatus: true)
 
-                    if ( exitCode == 2 ) {
-                        unstable(message: "High or Critical security vulnerabilities identified by Trivy. More Info: https://intranet.amobee.com/display/DOS/Trivy+Scans")
+                        if ( exitCode == 2 ) {
+                            unstable(message: "High or Critical security vulnerabilities identified by Trivy. More Info: https://intranet.amobee.com/display/DOS/Trivy+Scans")
+                        }
                     }
                 }
 
